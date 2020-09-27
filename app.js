@@ -1,4 +1,5 @@
 // * Package imports
+const cookieParser = require("cookie-parser");
 const express = require("express");
 const app = express();
 require("dotenv").config();
@@ -10,6 +11,7 @@ const userRoutes = require("./src/routes/userRoutes");
 // * global settings
 const port = process.env.PORT;
 app.use(express.json());
+app.use(cookieParser())
 
 // * connect to database
 const connectDB = async () => {
