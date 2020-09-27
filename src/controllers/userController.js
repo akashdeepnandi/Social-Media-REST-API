@@ -11,12 +11,22 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    const { firstName, lastName, email, _id } = await UserModel.create(req.body);
-		const token = await createToken(_id);
-		res.cookie('jwt', token, { httpOnly: true, maxAge: MAX_AGE * 1000 });
+    const { firstName, lastName, email, _id } = await UserModel.create(
+      req.body
+    );
+    const token = await createToken(_id);
+    res.cookie("jwt", token, { httpOnly: true, maxAge: MAX_AGE * 1000 });
     res.status(201).json({ firstName, lastName, email, token });
   } catch (err) {
-    console.log(err);
+    if (err.code === 11000)
+      res.status(409).json({
+        errors: [
+          {
+            msg: "User already exists",
+            param: "email",
+          },
+        ],
+      });
   }
 };
 
