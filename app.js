@@ -7,6 +7,8 @@ const mongoose = require("mongoose");
 
 // * Module imports
 const userRoutes = require("./src/routes/userRoutes");
+const authRoutes = require("./src/routes/authRoutes");
+const profileRoutes = require("./src/routes/profileRoutes");
 
 // * global settings
 const port = process.env.PORT;
@@ -35,6 +37,22 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 app.use("/users", userRoutes);
+app.use("/auth", authRoutes);
+app.use("/profile", profileRoutes);
+
+app.use(function (err, req, res, next) {
+  if (err.code !== 'EBADCSRFTOKEN') return next(err)
+
+  // handle CSRF token errors here
+  res.status(403).json({
+		errors: [
+			{
+				msg: "Invalid CSRF Token",
+				param: "csrf"
+			}
+		]
+	})
+})
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
