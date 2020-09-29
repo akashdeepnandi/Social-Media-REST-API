@@ -1,12 +1,11 @@
 const { Router } = require("express");
 const { body } = require("express-validator");
 const { loginUser } = require("../controllers/authController");
+const { csrfProtection, csrfMiddleware } = require("../middleware/csrfMiddleware");
 const router = Router();
-const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true })
 
-router.get('/login', csrfProtection, (req, res) => {
-	res.cookie('XSRF-TOKEN', req.csrfToken());
+
+router.get('/login', [csrfProtection, csrfMiddleware], (req, res) => {
 	res.json({})
 })
 

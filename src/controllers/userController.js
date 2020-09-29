@@ -14,8 +14,7 @@ const registerUser = async (req, res) => {
     const { firstName, lastName, email, _id } = await UserModel.create(
       req.body
     );
-    const token = await createToken(_id);
-    res.cookie("jwt", token, { httpOnly: true, maxAge: MAX_AGE * 1000 });
+    await createToken(_id, res);
     res.status(201).json({ firstName, lastName, email, token });
   } catch (err) {
     if (err.code === 11000)
