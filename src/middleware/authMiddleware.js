@@ -7,7 +7,6 @@ exports.requireAuth = (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
       if (err) console.log(err.message);
-      console.log(decodedToken);
       next();
     });
   } else {
@@ -25,12 +24,12 @@ exports.requireAuth = (req, res, next) => {
 exports.getCurrentUser = (req, res, next) => {
   const token = req.cookies.jwt;
   if (token) {
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+    jwt.verify(token, process.env.JWT_SECRET, async (err, { id }) => {
       if (err) {
         res.locals.user = null;
         next();
       } else {
-        const user = await UserModel.findById(decodedToken);
+				const user = await UserModel.findById(id);
         res.locals.user = user;
         next();
       }
