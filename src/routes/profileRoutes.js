@@ -1,7 +1,8 @@
 const { Router } = require("express");
 const {
   createProfile,
-  findUserProfile,
+	findUserProfile,
+	findUserProfileById
 } = require("../controllers/profileController");
 const { requireAuth, getCurrentUser } = require("../middleware/authMiddleware");
 const { body } = require("express-validator");
@@ -9,6 +10,7 @@ const {
   csrfProtection,
   csrfMiddleware,
 } = require("../middleware/csrfMiddleware");
+const { checkObjectId } = require("../middleware/mongooseMiddleware");
 const router = Router();
 
 router.get("/create-profile", [csrfProtection, csrfMiddleware], (req, res) => {
@@ -28,5 +30,7 @@ router.post(
 );
 
 router.get("/", [requireAuth, getCurrentUser], findUserProfile);
+
+router.get("/:user_id", [requireAuth, checkObjectId('user_id')],findUserProfileById)
 
 module.exports = router;

@@ -9,11 +9,12 @@ const mongoose = require("mongoose");
 const userRoutes = require("./src/routes/userRoutes");
 const authRoutes = require("./src/routes/authRoutes");
 const profileRoutes = require("./src/routes/profileRoutes");
+const { routeNotFound } = require("./src/middleware/appMiddleware");
 
 // * global settings
 const port = process.env.PORT;
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
 // * connect to database
 const connectDB = async () => {
@@ -41,18 +42,21 @@ app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
 
 app.use(function (err, req, res, next) {
-  if (err.code !== 'EBADCSRFTOKEN') return next(err)
+  if (err.code !== "EBADCSRFTOKEN") return next(err);
 
   // handle CSRF token errors here
   res.status(403).json({
-		errors: [
-			{
-				msg: "Invalid CSRF Token",
-				param: "csrf"
-			}
-		]
-	})
-})
+    errors: [
+      {
+        msg: "Invalid CSRF Token",
+        param: "csrf",
+      },
+    ],
+  });
+});
+
+app.use(routeNotFound);
+
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
