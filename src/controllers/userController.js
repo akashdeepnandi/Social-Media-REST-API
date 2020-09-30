@@ -15,7 +15,6 @@ const registerUser = async (req, res) => {
       req.body
     );
 		await createToken(_id, res);
-		console.log("User created")
     res.status(201).json({ firstName, lastName, email });
   } catch (err) {
 		console.error(err)
