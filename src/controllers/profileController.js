@@ -1,13 +1,16 @@
 const { ProfileModel } = require("../models/ProfileModel");
 const { validationResult } = require("express-validator");
 const UserModel = require("../models/UserModel");
+const { fileUploader } = require("../utils/utils");
+require("dotenv").config();
+const { unlinkSync } = require('fs');
 
 exports.createProfile = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  let { about, birthDate } = req.body;
+
   try {
     let profile = await ProfileModel.findOne({ user: res.locals.user._id });
     if (profile)
@@ -19,10 +22,13 @@ exports.createProfile = async (req, res) => {
           },
         ],
       });
+    const { about, birthDate } = req.body;
+    const image = fileUploader(req, res);
     profile = await ProfileModel.create({
       user: res.locals.user._id,
       about,
       birthDate,
+      image,
     });
     res.status(201).json(profile);
   } catch (err) {
@@ -159,12 +165,22 @@ exports.deleteProfile = async (req, res) => {
     const {
       locals: { user },
     } = res;
-    await ProfileModel.findOneAndRemove({ user: user });
+    const profile = await ProfileModel.findOne({ user });
+    if (!profile)
+      return res.json({
+        errors: [
+          {
+            msg: "Profile not found",
+            param: "profile",
+          },
+        ],
+      });
+    await ProfileModel.findOneAndRemove({ user });
     await UserModel.findOneAndRemove({ _id: user });
-    res.status(204).json({
-      msg: "success",
-    });
+		if(profile.image) unlinkSync(process.env.PROFILE_IMAGE_DIR+profile.image);
+		return res.status(204).json({});
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       errors: [
         {
