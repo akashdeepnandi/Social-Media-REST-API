@@ -14,18 +14,28 @@ const registerUser = async (req, res) => {
     const { firstName, lastName, email, _id } = await UserModel.create(
       req.body
     );
-    await createToken(_id, res);
-    res.status(201).json({ firstName, lastName, email, token });
+		await createToken(_id, res);
+		console.log("User created")
+    res.status(201).json({ firstName, lastName, email });
   } catch (err) {
+		console.error(err)
     if (err.code === 11000)
-      res.status(409).json({
+      return res.status(409).json({
         errors: [
           {
             msg: "User already exists",
             param: "email",
           },
         ],
-      });
+			});
+		res.status(500).json({
+			errors: [
+				{
+					msg: "Internal Server Error",
+					param: "server"
+				}
+			]
+		})
   }
 };
 
