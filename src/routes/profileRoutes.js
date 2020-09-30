@@ -16,9 +16,12 @@ const {
 const { checkObjectId } = require("../middleware/mongooseMiddleware");
 const router = Router();
 
+// * get csrf token for register profile
 router.get("/create", [csrfProtection, csrfMiddleware]);
+// * get csrf token for edit profile
 router.get("/edit", [csrfProtection, csrfMiddleware]);
 
+// * create profile
 router.post(
   "/",
   [
@@ -31,9 +34,12 @@ router.post(
   createProfile
 );
 
+// * find logged in user profile
 router.get("/", [requireAuth, getCurrentUser], findUserProfile);
+// * get all profiles
 router.get("/all-profiles", requireAuth, getAllProfiles);
 
+// * edit profile
 router.put(
   "/",
   [
@@ -45,6 +51,8 @@ router.put(
   ],
   editProfile
 );
+
+// * get user profile by id
 router.get(
   "/:user_id",
   [requireAuth, checkObjectId("user_id")],
