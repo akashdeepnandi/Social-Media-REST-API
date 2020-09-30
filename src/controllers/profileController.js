@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 const UserModel = require("../models/UserModel");
 const { fileUploader } = require("../utils/utils");
 require("dotenv").config();
-const { unlinkSync } = require('fs');
+const { unlinkSync, existsSync } = require("fs");
 
 exports.createProfile = async (req, res) => {
   const errors = validationResult(req);
@@ -177,8 +177,9 @@ exports.deleteProfile = async (req, res) => {
       });
     await ProfileModel.findOneAndRemove({ user });
     await UserModel.findOneAndRemove({ _id: user });
-		if(profile.image) unlinkSync(process.env.PROFILE_IMAGE_DIR+profile.image);
-		return res.status(204).json({});
+    if (profile.image)
+      unlinkSync(process.env.PROFILE_IMAGE_DIR + profile.image);
+    return res.status(204).json({});
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -190,4 +191,19 @@ exports.deleteProfile = async (req, res) => {
       ],
     });
   }
+};
+
+exports.sendProfileImage = ({ params: { name } }, res) => {
+  const filepath = 	`${process.env.PWD}/uploads/profile/images/${name}`;
+
+  if (existsSync(filepath)) res.sendFile(filepath);
+  else
+    res.status(404).json({
+      errors: [
+        {
+          msg: "Image not found",
+          param: "image",
+        },
+      ],
+    });
 };

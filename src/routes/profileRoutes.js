@@ -6,6 +6,7 @@ const {
   editProfile,
   getAllProfiles,
 	deleteProfile,
+	sendProfileImage
 } = require("../controllers/profileController");
 const { requireAuth, getCurrentUser } = require("../middleware/authMiddleware");
 const { body } = require("express-validator");
@@ -60,5 +61,7 @@ router.get(
 );
 
 router.delete('/', [requireAuth, getCurrentUser], deleteProfile);
+
+router.get('/image/:name', sendProfileImage)
 
 module.exports = router;
