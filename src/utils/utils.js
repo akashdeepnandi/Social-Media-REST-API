@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const MAX_AGE = 3 * 24 * 60 * 60;
 require('dotenv').config()
+const { unlinkSync, existsSync } = require("fs");
 
 const createToken = async (id, res) => {
   const token = await jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -38,8 +39,15 @@ const fileUploader = (req, res) => {
   }
 };
 
+const fileDeleter = (name) => {
+  const filepath = 	`${process.env.PWD}/uploads/profile/images/${name}`;
+	if(existsSync(filepath)) unlinkSync(filepath);
+	return
+}
+
 module.exports = {
   createToken,
   MAX_AGE,
-  fileUploader,
+	fileUploader,
+	fileDeleter
 };
