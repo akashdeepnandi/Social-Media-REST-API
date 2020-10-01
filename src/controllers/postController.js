@@ -241,3 +241,97 @@ exports.deleteComment = async ({ params: { post_id, comment_id } }, res) => {
     });
   }
 };
+
+exports.addLike = async (req, res) => {
+  const {
+    params: { post_id },
+    body,
+  } = req;
+  try {
+    let post = await PostModel.findOne({ _id: post_id });
+    if (!post)
+      return res.status(404).json({
+        errors: [
+          {
+            msg: "Post not found",
+            param: "post",
+          },
+        ],
+      });
+    let like = post.likes.find((like) => like.user.equals(res.locals.user._id));
+    if (like)
+      return res.status(409).json({
+        errors: [
+          {
+            msg: "You already have liked the post",
+            param: "post",
+          },
+        ],
+      });
+    like = {
+      user: res.locals.user._id,
+    };
+    post.likes.unshift(like);
+    await post.save();
+    res.status(201).json(post);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      errors: [
+        {
+          msg: "Internal Server Error",
+          param: "server",
+        },
+      ],
+    });
+  }
+};
+
+exports.deleteLike = async ({ params: { post_id, like_id } }, res) => {
+  try {
+    let post = await PostModel.findOne({ _id: post_id });
+    if (!post)
+      return res.status(404).json({
+        errors: [
+          {
+            msg: "Post not found",
+            param: "post",
+          },
+        ],
+      });
+    const like = post.likes.find((like) => like.id === like_id);
+    if (!like)
+      return res.json({
+        errors: [
+          {
+            msg: "Like not found",
+            param: "like",
+          },
+        ],
+      });
+    if (!like.user.equals(res.locals.user._id))
+      return res.status(401).json({
+        errors: [
+          {
+            msg: "You are not owner of this like",
+            param: "post",
+          },
+        ],
+      });
+    post.likes = post.likes.filter(
+      (like) => like.id !== like_id
+    );
+    await post.save();
+    res.json(post);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      errors: [
+        {
+          msg: "Internal Server Error",
+          param: "server",
+        },
+      ],
+    });
+  }
+};
