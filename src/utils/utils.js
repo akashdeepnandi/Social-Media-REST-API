@@ -11,7 +11,7 @@ const createToken = async (id, res) => {
   res.cookie("jwt", token, { httpOnly: true, maxAge: MAX_AGE * 1000 });
 };
 
-const fileUploader = (req, res) => {
+const fileUploader = (req, res, path) => {
   try {
     if (!req.files) {
       return;
@@ -21,7 +21,7 @@ const fileUploader = (req, res) => {
 
 			const filename = Date.now() + image.name;
       //Use the mv() method to place the file in upload directory (i.e. "uploads")
-      image.mv(process.env.PROFILE_IMAGE_DIR + filename);
+      image.mv(`${process.env.PWD}/uploads/${path}/${filename}`);
 
       //send response
       return filename;

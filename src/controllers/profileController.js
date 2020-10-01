@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 const UserModel = require("../models/UserModel");
 const { fileUploader, fileDeleter } = require("../utils/utils");
 require("dotenv").config();
-const { unlinkSync, existsSync } = require("fs");
+const { existsSync } = require("fs");
 
 exports.createProfile = async (req, res) => {
   const errors = validationResult(req);
@@ -23,7 +23,7 @@ exports.createProfile = async (req, res) => {
         ],
       });
     const { about, birthDate } = req.body;
-    const image = fileUploader(req, res);
+    const image = fileUploader(req, res, process.env.PROFILE_IMAGES_DIR);
     profile = await ProfileModel.create({
       user: res.locals.user._id,
       about,
@@ -107,7 +107,7 @@ exports.editProfile = async (req, res) => {
           },
         ],
 			});
-		const image = fileUploader(req, res);
+		const image = fileUploader(req, res, 'profile/images');
 		if(image) {
 			if(profile.image) fileDeleter(profile.image);
 			await ProfileModel.findOneAndUpdate({ user: res.locals.user._id }, {...req.body, image});
