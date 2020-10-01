@@ -16,6 +16,7 @@ const {
   deleteComment,
   addLike,
 	deleteLike,
+	sendPostImage,
 } = require("../controllers/postController");
 const { checkObjectId } = require("../middleware/mongooseMiddleware");
 
@@ -94,5 +95,7 @@ router.delete(
   ],
   deleteLike
 );
+
+router.get('/images/:name', sendPostImage);
 
 module.exports = router;

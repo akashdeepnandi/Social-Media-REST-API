@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const PostModel = require("../models/PostModel");
 const { fileUploader, fileDeleter } = require("../utils/utils");
 require("dotenv").config();
+const { existsSync } = require("fs");
 
 exports.createPost = async (req, res) => {
   const errors = validationResult(req);
@@ -318,9 +319,7 @@ exports.deleteLike = async ({ params: { post_id, like_id } }, res) => {
           },
         ],
       });
-    post.likes = post.likes.filter(
-      (like) => like.id !== like_id
-    );
+    post.likes = post.likes.filter((like) => like.id !== like_id);
     await post.save();
     res.json(post);
   } catch (err) {
@@ -334,4 +333,18 @@ exports.deleteLike = async ({ params: { post_id, like_id } }, res) => {
       ],
     });
   }
+};
+
+exports.sendPostImage = async ({ params: { name } }, res) => {
+  const filepath = `${process.env.PWD}/uploads/${process.env.POST_IMAGES_DIR}/${name}`;
+  if (existsSync(filepath)) res.sendFile(filepath);
+  else
+    res.status(404).json({
+      errors: [
+        {
+          msg: "Image not found",
+          param: "image",
+        },
+      ],
+    });
 };
