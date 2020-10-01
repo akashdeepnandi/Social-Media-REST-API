@@ -39,8 +39,8 @@ const fileUploader = (req, res, path) => {
   }
 };
 
-const fileDeleter = (name) => {
-  const filepath = 	`${process.env.PWD}/uploads/profile/images/${name}`;
+const fileDeleter = (name, route) => {
+  const filepath = 	`${process.env.PWD}/uploads/${route}/${name}`;
 	if(existsSync(filepath)) unlinkSync(filepath);
 	return
 }

@@ -4,13 +4,13 @@ const {
 	}
 } = require('mongoose');
 
-exports.checkObjectId = (param) => (req, res, next) => {
+exports.checkObjectId = (param, route) => (req, res, next) => {
 	if (!ObjectId.isValid(req.params[param]))
     return res.status(400).json({
 			errors: [
 				{
-					msg: "Profile not found",
-					param: "profile"
+					msg: route.charAt(0).toUpperCase() + route.slice(1) + " not found",
+					param: route
 				}
 			]
 		});

@@ -107,9 +107,9 @@ exports.editProfile = async (req, res) => {
           },
         ],
 			});
-		const image = fileUploader(req, res, 'profile/images');
+		const image = fileUploader(req, res, process.env.PROFILE_IMAGES_DIR);
 		if(image) {
-			if(profile.image) fileDeleter(profile.image);
+			if(profile.image) fileDeleter(profile.image, process.env.PROFILE_IMAGES_DIR);
 			await ProfileModel.findOneAndUpdate({ user: res.locals.user._id }, {...req.body, image});
 		} else {
 			await ProfileModel.findOneAndUpdate({ user: res.locals.user._id }, req.body);
@@ -186,7 +186,7 @@ exports.deleteProfile = async (req, res) => {
       });
     await ProfileModel.findOneAndRemove({ user });
     await UserModel.findOneAndRemove({ _id: user });
-    if (profile.image) fileDeleter(profile.image);
+    if (profile.image) fileDeleter(profile.image, process.env.PROFILE_IMAGES_DIR);
     return res.status(204).json({});
   } catch (err) {
     console.log(err);

@@ -56,7 +56,7 @@ router.put(
 // * get user profile by id
 router.get(
   "/:user_id",
-  [requireAuth, checkObjectId("user_id")],
+  [requireAuth, checkObjectId("user_id", "profile")],
   findUserProfileById
 );
 
