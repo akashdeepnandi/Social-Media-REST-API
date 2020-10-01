@@ -11,6 +11,7 @@ const fileUpload = require("express-fileupload");
 const userRoutes = require("./src/routes/userRoutes");
 const authRoutes = require("./src/routes/authRoutes");
 const profileRoutes = require("./src/routes/profileRoutes");
+const postRoutes = require("./src/routes/postRoutes");
 const { routeNotFound } = require("./src/middleware/appMiddleware");
 
 // * global settings and middleware
@@ -49,6 +50,7 @@ app.get("/", (req, res) => {
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
+app.use("/posts", postRoutes);
 
 app.use(function (err, req, res, next) {
   if (err.code !== "EBADCSRFTOKEN") return next(err);

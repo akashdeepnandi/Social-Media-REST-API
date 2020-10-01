@@ -127,7 +127,7 @@ exports.editProfile = async (req, res) => {
         ],
       });
 
-    res.json({updatedProfile});
+    res.json(updatedProfile);
   } catch (err) {
     res.status(404).json({
       errors: [
