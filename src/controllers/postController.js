@@ -348,3 +348,28 @@ exports.sendPostImage = async ({ params: { name } }, res) => {
       ],
     });
 };
+
+exports.findPostById = async ({ params: { post_id } }, res) => {
+	try {
+		const post = await PostModel.findOne({ _id: post_id }).populate('user').populate('comments.user');
+		if(!post) return res.status(404).json({
+			errors: [
+				{
+					msg: "Post not found",
+					param: "post"
+				}
+			]
+		});
+		res.json(post);
+	} catch (err) {
+		console.log(err);
+    return res.status(500).json({
+      errors: [
+        {
+          msg: "Internal Server Error",
+          param: "server",
+        },
+      ],
+    });
+	}
+}

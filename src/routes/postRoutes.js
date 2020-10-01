@@ -15,8 +15,9 @@ const {
   addComment,
   deleteComment,
   addLike,
-	deleteLike,
-	sendPostImage,
+  deleteLike,
+  sendPostImage,
+	findPostById,
 } = require("../controllers/postController");
 const { checkObjectId } = require("../middleware/mongooseMiddleware");
 
@@ -37,6 +38,15 @@ router.post(
 );
 
 router.get("/edit", [csrfProtection, csrfMiddleware]);
+
+router.get(
+  "/:post_id",
+  [
+    checkObjectId("post_id", "post"),
+    requireAuth,
+  ],
+  findPostById
+);
 
 router.put(
   "/:post_id",
@@ -96,6 +106,6 @@ router.delete(
   deleteLike
 );
 
-router.get('/images/:name', sendPostImage);
+router.get("/images/:name", sendPostImage);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const { Schema } = require("mongoose");
 exports.PostSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
+    ref: "user",
     required: true,
   },
   title: {
@@ -20,6 +21,8 @@ exports.PostSchema = new Schema({
     {
       user: {
         type: Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
       },
     },
   ],
@@ -28,6 +31,7 @@ exports.PostSchema = new Schema({
       user: {
         type: Schema.Types.ObjectId,
         required: true,
+        ref: "user",
       },
       body: {
         type: String,
