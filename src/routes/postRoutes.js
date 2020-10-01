@@ -12,6 +12,8 @@ const {
   editPost,
   getAllPosts,
   deletePost,
+  addComment,
+	deleteComment,
 } = require("../controllers/postController");
 const { checkObjectId } = require("../middleware/mongooseMiddleware");
 
@@ -50,6 +52,28 @@ router.delete(
   "/:post_id",
   [checkObjectId("post_id", "post"), requireAuth, getCurrentUser],
   deletePost
+);
+
+router.post(
+  "/comment/:post_id",
+  [
+    requireAuth,
+		getCurrentUser,
+    checkObjectId("post_id", "post"),
+    body("body").notEmpty().withMessage("Body of the comment is required"),
+  ],
+  addComment
+);
+
+router.delete(
+  "/comment/:post_id/:comment_id",
+  [
+		requireAuth,
+		checkObjectId("post_id", "post"),
+    checkObjectId("comment_id", "comment"),
+    getCurrentUser,
+  ],
+  deleteComment
 );
 
 module.exports = router;
