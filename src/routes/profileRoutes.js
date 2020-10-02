@@ -36,9 +36,9 @@ router.post(
 );
 
 // * find logged in user profile
-router.get("/", [requireAuth, getCurrentUser], findUserProfile);
+router.get("/me", [requireAuth, getCurrentUser], findUserProfile);
 // * get all profiles
-router.get("/all-profiles", requireAuth, getAllProfiles);
+router.get("/", requireAuth, getAllProfiles);
 
 // * edit profile
 router.put(
