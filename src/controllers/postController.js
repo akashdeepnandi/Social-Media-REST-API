@@ -11,18 +11,23 @@ exports.createPost = async (req, res) => {
   }
   try {
     const image = fileUploader(req, res, process.env.POST_IMAGES_DIR);
-    const post = await PostModel.create({
+    let post = await PostModel.create({
       ...req.body,
       user: res.locals.user._id,
       image,
     });
+    post = await PostModel.findOne({ _id: post._id }).populate("user", [
+      "firstName",
+      "lastName",
+      "email",
+    ]);
     res.status(201).json(post);
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
@@ -32,9 +37,12 @@ exports.createPost = async (req, res) => {
 
 exports.getAllPosts = async (req, res) => {
   try {
-    const posts = await PostModel.find({});
+    const posts = await PostModel.find({})
+      .populate("user", ["firstName", "lastName", "email"])
+      .populate("comments.user", ["firstName", "lastName", "email"])
+      .populate("likes.user", ["firstName", "lastName", "email"]);
     if (!posts)
-      return res.json({
+      return res.status(404).json({
         errors: [
           {
             msg: "No posts",
@@ -48,7 +56,7 @@ exports.getAllPosts = async (req, res) => {
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
@@ -92,16 +100,10 @@ exports.editPost = async (req, res) => {
     } else {
       await PostModel.findOneAndUpdate({ _id: post_id }, { ...body });
     }
-    const updatedPost = await PostModel.findOne({ _id: post_id });
-    if (!updatedPost)
-      return res.status(404).json({
-        errors: [
-          {
-            msg: "Post not found",
-            param: "post",
-          },
-        ],
-      });
+    const updatedPost = await PostModel.findOne({ _id: post_id })
+      .populate("user", ["firstName", "lastName", "email"])
+      .populate("comments.user", ["firstName", "lastName", "email"])
+      .populate("likes.user", ["firstName", "lastName", "email"]);
 
     res.json(updatedPost);
   } catch (err) {
@@ -109,7 +111,7 @@ exports.editPost = async (req, res) => {
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
@@ -140,13 +142,13 @@ exports.deletePost = async ({ params: { post_id } }, res) => {
       });
     await PostModel.findOneAndRemove({ _id: post_id });
     if (post.image) fileDeleter(post.image, process.env.POST_IMAGES_DIR);
-    return res.status(204).json({});
+    return res.status(200).json({});
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
@@ -180,13 +182,17 @@ exports.addComment = async (req, res) => {
     };
     post.comments.unshift(comment);
     await post.save();
+    post = await PostModel.findOne({ _id: post_id })
+      .populate("user", ["firstName", "lastName", "email"])
+      .populate("comments.user", ["firstName", "lastName", "email"])
+      .populate("likes.user", ["firstName", "lastName", "email"]);
     res.status(201).json(post);
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
@@ -212,7 +218,7 @@ exports.deleteComment = async ({ params: { post_id, comment_id } }, res) => {
         errors: [
           {
             msg: "Comment not found",
-            param: "comment",
+            param: "post",
           },
         ],
       });
@@ -235,7 +241,7 @@ exports.deleteComment = async ({ params: { post_id, comment_id } }, res) => {
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
@@ -274,13 +280,17 @@ exports.addLike = async (req, res) => {
     };
     post.likes.unshift(like);
     await post.save();
+    post = await PostModel.findOne({ _id: post_id })
+      .populate("user", ["firstName", "lastName", "email"])
+      .populate("comments.user", ["firstName", "lastName", "email"])
+      .populate("likes.user", ["firstName", "lastName", "email"]);
     res.status(201).json(post);
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
@@ -306,7 +316,7 @@ exports.deleteLike = async ({ params: { post_id, like_id } }, res) => {
         errors: [
           {
             msg: "Like not found",
-            param: "like",
+            param: "post",
           },
         ],
       });
@@ -327,7 +337,7 @@ exports.deleteLike = async ({ params: { post_id, like_id } }, res) => {
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
@@ -343,33 +353,37 @@ exports.sendPostImage = async ({ params: { name } }, res) => {
       errors: [
         {
           msg: "Image not found",
-          param: "image",
+          param: "post",
         },
       ],
     });
 };
 
 exports.findPostById = async ({ params: { post_id } }, res) => {
-	try {
-		const post = await PostModel.findOne({ _id: post_id }).populate('user').populate('comments.user');
-		if(!post) return res.status(404).json({
-			errors: [
-				{
-					msg: "Post not found",
-					param: "post"
-				}
-			]
-		});
-		res.json(post);
-	} catch (err) {
-		console.log(err);
+  try {
+    const post = await PostModel.findOne({ _id: post_id })
+      .populate("user", ["firstName", "lastName", "email"])
+      .populate("comments.user", ["firstName", "lastName", "email"])
+      .populate("likes.user", ["firstName", "lastName", "email"]);
+    if (!post)
+      return res.status(404).json({
+        errors: [
+          {
+            msg: "Post not found",
+            param: "post",
+          },
+        ],
+      });
+    res.json(post);
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
     });
-	}
-}
+  }
+};

@@ -223,7 +223,7 @@ exports.sendProfileImage = ({ params: { name } }, res) => {
       errors: [
         {
           msg: "Image not found",
-          param: "image",
+          param: "profile",
         },
       ],
     });

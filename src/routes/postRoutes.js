@@ -17,13 +17,13 @@ const {
   addLike,
   deleteLike,
   sendPostImage,
-	findPostById,
+  findPostById,
 } = require("../controllers/postController");
 const { checkObjectId } = require("../middleware/mongooseMiddleware");
 
 router.get("/", requireAuth, getAllPosts);
 
-router.get("/create", [csrfProtection, csrfMiddleware]);
+router.get("/create", [requireAuth, csrfProtection, csrfMiddleware]);
 
 router.post(
   "/",
@@ -37,22 +37,19 @@ router.post(
   createPost
 );
 
-router.get("/edit", [csrfProtection, csrfMiddleware]);
+router.get("/edit", [requireAuth, csrfProtection, csrfMiddleware]);
 
 router.get(
   "/:post_id",
-  [
-    checkObjectId("post_id", "post"),
-    requireAuth,
-  ],
+  [requireAuth, checkObjectId("post_id", "post")],
   findPostById
 );
 
 router.put(
   "/:post_id",
   [
-    checkObjectId("post_id", "post"),
     requireAuth,
+    checkObjectId("post_id", "post"),
     getCurrentUser,
     csrfProtection,
     body("title").notEmpty().withMessage("Title of the post is required"),
@@ -63,7 +60,7 @@ router.put(
 
 router.delete(
   "/:post_id",
-  [checkObjectId("post_id", "post"), requireAuth, getCurrentUser],
+  [requireAuth, checkObjectId("post_id", "post"), getCurrentUser],
   deletePost
 );
 
