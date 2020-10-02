@@ -2,7 +2,7 @@ const { body } = require("express-validator");
 
 const { Router } = require("express");
 const router = Router();
-const { getUsers, registerUser } = require("../controllers/userController");
+const { registerUser } = require("../controllers/userController");
 
 
 router.post(

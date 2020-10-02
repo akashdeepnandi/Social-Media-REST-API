@@ -5,8 +5,8 @@ const {
   findUserProfileById,
   editProfile,
   getAllProfiles,
-	deleteProfile,
-	sendProfileImage
+  deleteProfile,
+  sendProfileImage,
 } = require("../controllers/profileController");
 const { requireAuth, getCurrentUser } = require("../middleware/authMiddleware");
 const { body } = require("express-validator");
@@ -18,9 +18,9 @@ const { checkObjectId } = require("../middleware/mongooseMiddleware");
 const router = Router();
 
 // * get csrf token for register profile
-router.get("/create", [csrfProtection, csrfMiddleware]);
+router.get("/create", [requireAuth, csrfProtection, csrfMiddleware]);
 // * get csrf token for edit profile
-router.get("/edit", [csrfProtection, csrfMiddleware]);
+router.get("/edit", [requireAuth, csrfProtection, csrfMiddleware]);
 
 // * create profile
 router.post(
@@ -60,8 +60,8 @@ router.get(
   findUserProfileById
 );
 
-router.delete('/', [requireAuth, getCurrentUser], deleteProfile);
+router.delete("/", [requireAuth, getCurrentUser], deleteProfile);
 
-router.get('/image/:name', sendProfileImage)
+router.get("/image/:name", sendProfileImage);
 
 module.exports = router;
