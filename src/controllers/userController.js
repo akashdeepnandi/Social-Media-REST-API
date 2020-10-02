@@ -1,9 +1,6 @@
 const { validationResult } = require("express-validator");
 const UserModel = require("../models/UserModel");
-const { createToken, MAX_AGE } = require("../utils/utils");
-const getUsers = (req, res) => {
-  res.send("Hellos");
-};
+const { createToken } = require("../utils/utils");
 
 const registerUser = async (req, res) => {
   const errors = validationResult(req);
@@ -11,13 +8,11 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    const { firstName, lastName, email, _id } = await UserModel.create(
-      req.body
-    );
-		await createToken(_id, res);
-    res.status(201).json({ firstName, lastName, email });
+    const user = await UserModel.create(req.body);
+    await createToken(user._id, res);
+    res.status(201).json(user);
   } catch (err) {
-		console.error(err)
+    console.error(err);
     if (err.code === 11000)
       return res.status(409).json({
         errors: [
@@ -26,15 +21,15 @@ const registerUser = async (req, res) => {
             param: "email",
           },
         ],
-			});
-		res.status(500).json({
-			errors: [
-				{
-					msg: "Internal Server Error",
-					param: "server"
-				}
-			]
-		})
+      });
+    res.status(500).json({
+      errors: [
+        {
+          msg: "Internal Server Error",
+          param: "server",
+        },
+      ],
+    });
   }
 };
 

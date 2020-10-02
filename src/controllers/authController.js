@@ -15,7 +15,7 @@ const loginUser = async (req, res) => {
       return res.status(404).json({
         errors: [
           {
-            msg: "User not found",
+            msg: "User does not exist, create an account",
             param: "email",
           },
         ],
@@ -35,10 +35,11 @@ const loginUser = async (req, res) => {
     await createToken(user._id, res);
     res.json(user);
   } catch (err) {
+		console.log(err)
     res.status(500).json({
       errors: [
         {
-          msg: "Interval Server Error",
+          msg: "Interval server error",
           param: "server",
         },
       ],
