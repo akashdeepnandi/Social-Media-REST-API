@@ -27,11 +27,11 @@ const fileUploader = (req, res, path) => {
       return filename;
     }
   } catch (err) {
-		console.log(err)
-    return res.status(500).json({
+		console.log(err);
+    res.status(500).json({
       errors: [
         {
-          msg: "Internal Server Error",
+          msg: "Internal server error",
           param: "server",
         },
       ],
